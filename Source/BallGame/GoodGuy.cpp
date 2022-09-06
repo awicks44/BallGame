@@ -57,10 +57,9 @@ void AGoodGuy::Tick(float DeltaTime)
     if (!MovementDirection.IsZero())
     {
         UE_LOG(LogTemp, Warning, TEXT("Manual Movement"));
-
-        FVector TargetLocation = GetActorLocation() + MovementDirection * MovementSpeed * DeltaTime;
-        SetActorLocation(TargetLocation);
-        StartLocation = TargetLocation;
+        
+        AddActorLocalOffset(MovementDirection * MovementSpeed * DeltaTime);
+        StartLocation = GetActorLocation();
     }
     else 
     {
@@ -72,27 +71,26 @@ void AGoodGuy::Tick(float DeltaTime)
 
 void AGoodGuy::MoveForward(float Value)
 {
-    MovementDirection.X = FMath::Clamp(Value, -1, 1);
+    MovementDirection.X = Value;
 }
 
 void AGoodGuy::MoveRight(float Value)
 {
-    MovementDirection.Y = FMath::Clamp(Value, -1, 1);
+    MovementDirection.Y = Value;
 }
 
 void AGoodGuy::LookUp(float Value)
 {
-    AddControllerPitchInput(Value * RotationRate * GetWorld()->GetDeltaSeconds());
+    FRotator DeltaRotation = FRotator::ZeroRotator;
+    DeltaRotation.Pitch = FMath::Clamp(Value, -1, 1) * RotationRate * GetWorld()->GetDeltaSeconds();   
+    AddActorLocalRotation(DeltaRotation);
 }
 
 void AGoodGuy::LookRight(float Value)
 {
-    AddControllerYawInput(Value * RotationRate * GetWorld()->GetDeltaSeconds());
-
-    // FRotator DeltaRotation = FRotator::ZeroRotator;
-    // DeltaRotation.Yaw = Value * RotationRate * GetWorld()->GetDeltaSeconds();
-   
-    // AddActorLocalRotation(DeltaRotation);
+    FRotator DeltaRotation = FRotator::ZeroRotator;
+    DeltaRotation.Yaw = Value * RotationRate * GetWorld()->GetDeltaSeconds();   
+    AddActorLocalRotation(DeltaRotation);
 }
 
 void AGoodGuy::Launch()
